@@ -397,8 +397,70 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
+
+    public function getHeatingCoolingMethodAC()
+    {
+        try {
+            $sql = "SELECT Household.household_type,
+            COUNT(DISTINCT AirConditioner.appliance_num) AS AC_count,
+            ROUND(AVG(Appliance.BTU_rating)) AS AC_average_BTU,
+            ROUND(AVG(AirConditioner.EER),1) AS AC_average_EER
+            FROM Household
+            INNER JOIN AirConditioner ON Household.email = AirConditioner.email
+            INNER JOIN Appliance on Household.email = Appliance.email
+            GROUP BY Household.household_type
+            ORDER BY Household.household_type ASC;";
+            $result = $this->db->query($sql);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
+    public function getHeatingCoolingMethodHeater()
+    {
+        try {
+            $sql = "SELECT Household.household_type,
+            COUNT(DISTINCT Heater.appliance_num) AS Heater_count,
+            ROUND(AVG(Appliance.BTU_rating)) AS Heater_average_BTU,
+            MAX(Heater.energy_source) AS Heater_most_common_energy_source
+            FROM Household
+            INNER JOIN Heater ON Household.email = Heater.email
+            INNER JOIN Appliance on Household.email = Appliance.email
+            GROUP BY Household.household_type
+            ORDER BY Household.household_type ASC;";
+            $result = $this->db->query($sql);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
+    public function getHeatingCoolingMethodHP()
+    {
+        try {
+            $sql = "SELECT Household.household_type,
+            COUNT(DISTINCT HeatPump.appliance_num) AS HeatPump_count,
+            ROUND(AVG(Appliance.BTU_rating)) AS HeatPump_average_BTU,
+            ROUND(AVG(HeatPump.SEER),1) AS HeatPump_average_SEER,
+            ROUND(AVG(HeatPump.HSPF),1) AS HeatPump_average_HSPF
+            FROM Household
+            INNER JOIN HeatPump ON Household.email = HeatPump.email
+            INNER JOIN Appliance on Household.email = Appliance.email
+            GROUP BY Household.household_type
+            ORDER BY Household.household_type ASC;";
+            $result = $this->db->query($sql);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
     
-       
+    
        
     
     //JX
@@ -448,7 +510,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
-    
+    //JX
     public function getStateMinimumCapacity($state)
     {
         try {
@@ -469,7 +531,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
-
+    //JX
     public function getStateAverageCapacity($state)
     {
         try {
@@ -490,7 +552,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
-    
+    //JX
     public function getStateMaximumCapacity($state)
     {
         try {
@@ -511,7 +573,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
-    
+    //JX
     public function getStateMinimumTempSetting($state)
     {
         try {
@@ -532,7 +594,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
-    
+    //JX
     public function getStateAverageTempSetting($state)
     {
         try {
@@ -553,7 +615,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
-    
+    //JX
     public function getStateMaximumTempSetting($state)
     {
         try {
@@ -569,6 +631,95 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
         $result = $stmt->fetch();
         // print_r($result);
         return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
+    //JX
+    public function getsStateWithMostoffCount()
+    {
+        try {
+            $sql = "SELECT state, COUNT(*) AS count_off_grid
+            FROM Household h
+            JOIN Location l ON h.postal_code = l.postal_code
+            WHERE NOT EXISTS (SELECT email FROM PublicUtility pu WHERE pu.email = h.email)
+            GROUP BY state
+            ORDER BY count_off_grid DESC
+            LIMIT 1;";
+            $result = $this->db->query($sql);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getAverageBatterykWhforoff()
+    {
+        try {
+            $sql = "SELECT ROUND(AVG(battery_kWh)) AS avg_battery_capacity
+            FROM PowerGeneration pg
+            JOIN Household h ON h.email = pg.email
+            WHERE NOT EXISTS (SELECT email FROM PublicUtility pu WHERE pu.email = h.email);";
+            $result = $this->db->query($sql);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getPercentagePowerGenerationType()
+    {
+        try {
+            $sql = "SELECT generator_type,
+            ROUND(100 * COUNT(*) / SUM(COUNT(*)) OVER(), 1) AS percentage
+            FROM PowerGeneration pg
+            JOIN Household h ON h.email = pg.email
+            WHERE NOT EXISTS (SELECT email FROM PublicUtility pu WHERE pu.email = h.email)
+            GROUP BY generator_type;";
+            $result = $this->db->query($sql);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getWaterHeaterCapacity()
+    {
+        try {
+            $sql = "SELECT
+            ROUND(AVG(CASE WHEN NOT EXISTS (SELECT email FROM PublicUtility pu WHERE pu.email = h.email)
+                            THEN wh.capacity END), 1) AS avg_capacity_off_grid,
+            ROUND(AVG(CASE WHEN EXISTS (SELECT email FROM PublicUtility pu WHERE pu.email = h.email)
+                            THEN wh.capacity END), 1) AS avg_capacity_on_grid
+            FROM WaterHeater wh
+            JOIN Household h ON h.email = wh.email;";
+            $result = $this->db->query($sql);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getBUTsforoffthegrid()
+    {
+        try {
+            $sql = "SELECT
+            CASE WHEN a.email = wh.email THEN 'WaterHeater' ELSE 'AirHandler' END AS appliance_type,
+            ROUND(MIN(a.BTU_rating)) AS min_BTU_rating,
+            ROUND(AVG(a.BTU_rating)) AS avg_BTU_rating,
+            ROUND(MAX(a.BTU_rating)) AS max_BTU_rating
+            FROM Appliance a
+            LEFT JOIN WaterHeater wh ON a.email = wh.email AND a.appliance_num = wh.appliance_num
+            WHERE NOT EXISTS (SELECT email FROM PublicUtility pu WHERE pu.email = a.email)
+            GROUP BY appliance_type;";
+            $result = $this->db->query($sql);
+            return $result;
         } catch (PDOException $e) {
             echo $e->getMessage();
             return false;
