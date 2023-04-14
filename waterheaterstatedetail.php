@@ -28,7 +28,8 @@ if (!isset($_GET['state'])) {
     if(!$result7) {$result7[0]= "0";};
 ?>
 <table class="table">
-    <h2><?php echo $state; ?></h2>
+    
+<h2><?php echo $state; ?> State Water Heater Detail</h2>
 <tr>
         <th>Energy Source</th>
         <th>Minimum Capacity</th>
