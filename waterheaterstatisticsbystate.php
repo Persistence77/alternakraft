@@ -8,6 +8,8 @@ require_once 'db/conn.php';
 $results = $crud->getwaterheaterstatistics();
 // print_r($results);
 ?>
+<h1>Water Heater Statistic by State</h1>
+<br />
 <table class="table">
 <tr>
         <th>State</th>
