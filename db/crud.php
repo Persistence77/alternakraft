@@ -486,144 +486,23 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
-
     //JX
-        public function getStateEnergysource($state)
+    public function getStateWaterHeaterDetail($state)
     {
         try {
-        $sql = "SELECT w.energy_source
+        $sql = "SELECT w.energy_source,
+        COALESCE(MIN(w.capacity), 0) AS Minimum_Capacity,
+        COALESCE(ROUND(AVG(w.capacity)), 0) AS Average_Capacity,
+        COALESCE(MAX(w.capacity), 0) AS Maximum_Capacity,
+        COALESCE(MIN(w.temperature_setting), 0) AS Minimum_Temperature_Setting,
+        COALESCE(ROUND(AVG(w.temperature_setting), 1), 0) AS Average_Temperature_Setting,
+        COALESCE(MAX(w.temperature_setting), 0) AS Maximum_Temperature_Setting
         FROM Location l
         LEFT JOIN Household h ON l.postal_code = h.postal_code
         LEFT JOIN WaterHeater w ON h.email = w.email
         WHERE l.state = :state
         GROUP BY w.energy_source
         ORDER BY w.energy_source ASC;";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindparam(':state', $state);
-        $stmt->execute();
-        // print_r($stmt);
-        $result = $stmt->fetch();
-        // print_r($result);
-        return $result;
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-            return false;
-        }
-    }
-    //JX
-    public function getStateMinimumCapacity($state)
-    {
-        try {
-        $sql = "SELECT COALESCE(MIN(w.capacity), 0) AS MinimumCapacity
-        FROM Location l
-        LEFT JOIN Household h ON l.postal_code = h.postal_code
-        LEFT JOIN WaterHeater w ON h.email = w.email
-        WHERE l.state = :state;";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindparam(':state', $state);
-        $stmt->execute();
-        // print_r($stmt);
-        $result = $stmt->fetch();
-        // print_r($result);
-        return $result;
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-            return false;
-        }
-    }
-    //JX
-    public function getStateAverageCapacity($state)
-    {
-        try {
-        $sql = "SELECT COALESCE(ROUND(AVG(w.capacity)), 0) AS AverageCapacity
-        FROM Location l
-        LEFT JOIN Household h ON l.postal_code = h.postal_code
-        LEFT JOIN WaterHeater w ON h.email = w.email
-        WHERE l.state = :state;";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindparam(':state', $state);
-        $stmt->execute();
-        // print_r($stmt);
-        $result = $stmt->fetch();
-        // print_r($result);
-        return $result;
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-            return false;
-        }
-    }
-    //JX
-    public function getStateMaximumCapacity($state)
-    {
-        try {
-        $sql = "SELECT COALESCE(MAX(w.capacity), 0) AS MaximumCapacity
-        FROM Location l
-        LEFT JOIN Household h ON l.postal_code = h.postal_code
-        LEFT JOIN WaterHeater w ON h.email = w.email
-        WHERE l.state = :state;";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindparam(':state', $state);
-        $stmt->execute();
-        // print_r($stmt);
-        $result = $stmt->fetch();
-        // print_r($result);
-        return $result;
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-            return false;
-        }
-    }
-    //JX
-    public function getStateMinimumTempSetting($state)
-    {
-        try {
-        $sql = "SELECT COALESCE(MIN(w.temperature_setting), 0) AS MinimumTemperatureSetting
-        FROM Location l
-        LEFT JOIN Household h ON l.postal_code = h.postal_code
-        LEFT JOIN WaterHeater w ON h.email = w.email
-        WHERE l.state = :state;";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindparam(':state', $state);
-        $stmt->execute();
-        // print_r($stmt);
-        $result = $stmt->fetch();
-        // print_r($result);
-        return $result;
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-            return false;
-        }
-    }
-    //JX
-    public function getStateAverageTempSetting($state)
-    {
-        try {
-        $sql = "SELECT  COALESCE(ROUND(AVG(w.temperature_setting), 1), 0) AS AverageTemperatureSetting
-        FROM Location l
-        LEFT JOIN Household h ON l.postal_code = h.postal_code
-        LEFT JOIN WaterHeater w ON h.email = w.email
-        WHERE l.state = :state;";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindparam(':state', $state);
-        $stmt->execute();
-        // print_r($stmt);
-        $result = $stmt->fetch();
-        // print_r($result);
-        return $result;
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-            return false;
-        }
-    }
-    //JX
-    public function getStateMaximumTempSetting($state)
-    {
-        try {
-        $sql = "SELECT COALESCE(MAX(w.temperature_setting), 0) AS MaximumTemperatureSetting
-        FROM Location l
-        LEFT JOIN Household h ON l.postal_code = h.postal_code
-        LEFT JOIN WaterHeater w ON h.email = w.email
-        WHERE l.state = :state";
         $stmt = $this->db->prepare($sql);
         $stmt->bindparam(':state', $state);
         $stmt->execute();
