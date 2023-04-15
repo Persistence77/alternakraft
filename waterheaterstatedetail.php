@@ -11,21 +11,15 @@ if (!isset($_GET['state'])) {
 } else {
     $state = $_GET['state'];
     // echo $state;
-    $result1 = $crud->getStateEnergysource($state);
-    $result2 = $crud->getStateMinimumCapacity($state);
-    $result3 = $crud->getStateAverageCapacity($state);
-    $result4 = $crud->getStateMaximumCapacity($state);
-    $result5 = $crud->getStateMinimumTempSetting($state);
-    $result6 = $crud->getStateAverageTempSetting($state);
-    $result7 = $crud->getStateMaximumTempSetting($state);
+    $result = $crud->getStateWaterHeaterDetail($state);
 
-    if(!$result1) {$result1[0]= "0";}
-    if(!$result2) {$result2[0]= "0";}
-    if(!$result3) {$result3[0]= "0";}
-    if(!$result4) {$result4[0]= "0";}
-    if(!$result5) {$result5[0]= "0";}
-    if(!$result6) {$result6[0]= "0";}
-    if(!$result7) {$result7[0]= "0";};
+    if(!$result['energy_source']) {$result['energy_source']= "0";}
+    if(!$result['Minimum_Capacity']) {$result['Minimum_Capacity']= "0";}
+    if(!$result['Average_Capacity']) {$result['Average_Capacity']= "0";}
+    if(!$result['Maximum_Capacity']) {$result['Maximum_Capacity']= "0";}
+    if(!$result['Minimum_Temperature_Setting']) {$result['Minimum_Temperature_Setting']= "0";}
+    if(!$result['Average_Temperature_Setting']) {$result['Average_Temperature_Setting']= "0";}
+    if(!$result['Maximum_Temperature_Setting']) {$result['Maximum_Temperature_Setting']= "0";}
 ?>
 <table class="table">
     
@@ -41,13 +35,13 @@ if (!isset($_GET['state'])) {
 </tr>
 <tr>
 
-        <td><?php echo $result1[0]; ?></td>
-        <td><?php echo $result2[0]; ?></td>
-        <td><?php echo $result3[0]; ?></td>
-        <td><?php echo $result4[0]; ?></td>
-        <td><?php echo $result5[0]; ?></td>
-        <td><?php echo $result6[0]; ?></td>
-        <td><?php echo $result7[0]; ?></td>
+        <td><?php echo $result['energy_source']; ?></td>
+        <td><?php echo $result['Minimum_Capacity']; ?></td>
+        <td><?php echo $result['Average_Capacity']; ?></td>
+        <td><?php echo $result['Maximum_Capacity']; ?></td>
+        <td><?php echo $result['Minimum_Temperature_Setting']; ?></td>
+        <td><?php echo $result['Average_Temperature_Setting']; ?></td>
+        <td><?php echo $result['Maximum_Temperature_Setting']; ?></td>
 
 
 </table>
