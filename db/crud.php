@@ -604,4 +604,206 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             return false;
         }
     }
+    
+    //JX
+    public function getHouseholdWithinSearchArea($hsearch, $selected_radius)
+    {
+        try {
+            $sql = "SELECT count(*) AS count_household,
+            ROUND(AVG(square_footage)) AS square_footage,
+            ROUND(AVG(heating_setting),1) AS heating_setting,
+            ROUND(AVG(cooling_setting),1) AS cooling_setting,
+            COUNT(CASE WHEN NOT EXISTS (SELECT email FROM PublicUtility pu WHERE pu.email = h.email) THEN h.email END) AS count_off_grid_household
+            FROM Household h
+            WHERE postal_code
+            IN
+            (SELECT y.postal_code
+            FROM Location y
+            CROSS JOIN Location x 
+            WHERE x.postal_code = :postal_code
+            AND y.postal_code IN
+            (SELECT l.postal_code
+            FROM Location l
+            INNER JOIN Household h on h.postal_code = l.postal_code)
+            AND (3985.75 * 2*ATAN2(SQRT(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2)), SQRT(1-(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2))))) < :radius);
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindparam(':postal_code', $hsearch);
+            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->execute();
+            // print_r($stmt);
+            $result = $stmt->fetch();
+            // print_r($result);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getHouseholdType($hsearch, $selected_radius)
+    {
+        try {
+            $sql = "SELECT 
+            household_type, COUNT(*) AS count_each_type
+            FROM Household h
+            WHERE postal_code
+            IN
+            (SELECT y.postal_code
+            FROM Location y
+            CROSS JOIN Location x 
+            WHERE x.postal_code = :postal_code
+            AND y.postal_code IN
+            (SELECT l.postal_code
+            FROM Location l
+            INNER JOIN Household h on h.postal_code = l.postal_code)
+            AND (3985.75 * 2*ATAN2(SQRT(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2)), SQRT(1-(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2))))) < :radius)
+            AND h.household_type IN('House','Apartment','Townhome','Condominium','Mobile home')
+            GROUP BY household_type;         
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindparam(':postal_code', $hsearch);
+            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->execute();
+            // print_r($stmt);
+            $result = $stmt->fetch();
+            // print_r($result);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getPublicUtility($hsearch, $selected_radius)
+    {
+        try {
+            $sql = "SELECT DISTINCT pu.utility_type AS utility_type
+            FROM Household h
+            INNER JOIN PublicUtility pu on h.email = pu.email
+            WHERE h.postal_code
+            IN
+            (SELECT y.postal_code
+            FROM Location y
+            CROSS JOIN Location x 
+            WHERE x.postal_code = :postal_code
+            AND y.postal_code IN
+            (SELECT l.postal_code
+            FROM Location l
+            INNER JOIN Household h on h.postal_code = l.postal_code)
+            AND (3985.75 * 2*ATAN2(SQRT(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2)), SQRT(1-(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2))))) < :radius);            
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindparam(':postal_code', $hsearch);
+            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->execute();
+            // print_r($stmt);
+            $result = $stmt->fetch();
+            // print_r($result);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getHouseholdWithPowerGeneration($hsearch, $selected_radius)
+    {
+        try {
+            $sql = "SELECT COUNT(*) AS count_homes_with_power_generation
+            FROM Household h
+            INNER JOIN PowerGeneration pg on h.email = pg.email
+            WHERE h.postal_code
+            IN
+            (SELECT y.postal_code
+            FROM Location y
+            CROSS JOIN Location x 
+            WHERE x.postal_code = :postal_code
+            AND y.postal_code IN
+            (SELECT l.postal_code
+            FROM Location l
+            INNER JOIN Household h on h.postal_code = l.postal_code)
+            AND (3985.75 * 2*ATAN2(SQRT(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2)), SQRT(1-(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2))))) < :radius);            
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindparam(':postal_code', $hsearch);
+            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->execute();
+            // print_r($stmt);
+            $result = $stmt->fetch();
+            // print_r($result);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getGenerationMethod($hsearch, $selected_radius)
+    {
+        try {
+            $sql = "SELECT generator_type, COUNT(*) AS count_most
+            FROM Household h
+            INNER JOIN PowerGeneration pg on h.email = pg.email
+            WHERE h.postal_code
+            IN
+            (SELECT y.postal_code
+            FROM Location y
+            CROSS JOIN Location x 
+            WHERE x.postal_code = :postal_code
+            AND y.postal_code IN
+            (SELECT l.postal_code
+            FROM Location l
+            INNER JOIN Household h on h.postal_code = l.postal_code)
+            AND (3985.75 * 2*ATAN2(SQRT(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2)), SQRT(1-(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2))))) < :radius)
+            GROUP BY pg.generator_type
+            ORDER BY total DESC
+            Limit 1;            
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindparam(':postal_code', $hsearch);
+            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->execute();
+            // print_r($stmt);
+            $result = $stmt->fetch();
+            // print_r($result);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+    //JX
+    public function getGenerationCapacityStorage($hsearch, $selected_radius)
+    {
+        try {
+            $sql = "SELECT AVG(monthly_kWh) AS avg_monthly_kWh, 
+            COUNT(DISTINCT battery_kWh) as count_household_has_battery_storage
+            FROM Household h
+            INNER JOIN PowerGeneration pg on h.email = pg.email
+            WHERE h.postal_code
+            IN
+            (SELECT y.postal_code
+            FROM Location y
+            CROSS JOIN Location x 
+            WHERE x.postal_code = :postal_code
+            AND y.postal_code IN
+            (SELECT l.postal_code
+            FROM Location l
+            INNER JOIN Household h on h.postal_code = l.postal_code)
+            AND (3985.75 * 2*ATAN2(SQRT(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2)), SQRT(1-(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2))))) < :radius);                        
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindparam(':postal_code', $hsearch);
+            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->execute();
+            // print_r($stmt);
+            $result = $stmt->fetch();
+            // print_r($result);
+            return $result;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
 }
