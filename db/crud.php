@@ -629,7 +629,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             ";
             $stmt = $this->db->prepare($sql);
             $stmt->bindparam(':postal_code', $hsearch);
-            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->bindparam(':radius', $selected_radius);
             $stmt->execute();
             // print_r($stmt);
             $result = $stmt->fetch();
@@ -663,7 +663,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             ";
             $stmt = $this->db->prepare($sql);
             $stmt->bindparam(':postal_code', $hsearch);
-            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->bindparam(':radius', $selected_radius);
             $stmt->execute();
             // print_r($stmt);
             $result = $stmt->fetch();
@@ -695,7 +695,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             ";
             $stmt = $this->db->prepare($sql);
             $stmt->bindparam(':postal_code', $hsearch);
-            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->bindparam(':radius', $selected_radius);
             $stmt->execute();
             // print_r($stmt);
             $result = $stmt->fetch();
@@ -727,7 +727,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             ";
             $stmt = $this->db->prepare($sql);
             $stmt->bindparam(':postal_code', $hsearch);
-            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->bindparam(':radius', $selected_radius);
             $stmt->execute();
             // print_r($stmt);
             $result = $stmt->fetch();
@@ -762,7 +762,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             ";
             $stmt = $this->db->prepare($sql);
             $stmt->bindparam(':postal_code', $hsearch);
-            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->bindparam(':radius', $selected_radius);
             $stmt->execute();
             // print_r($stmt);
             $result = $stmt->fetch();
@@ -795,7 +795,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             ";
             $stmt = $this->db->prepare($sql);
             $stmt->bindparam(':postal_code', $hsearch);
-            $stmt->bindValue(':radius', $selected_radius);
+            $stmt->bindparam(':radius', $selected_radius);
             $stmt->execute();
             // print_r($stmt);
             $result = $stmt->fetch();
