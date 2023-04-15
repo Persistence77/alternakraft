@@ -757,7 +757,7 @@ public function insertappliance($email, $manufacturer_name, $model_name, $BTU_ra
             INNER JOIN Household h on h.postal_code = l.postal_code)
             AND (3985.75 * 2*ATAN2(SQRT(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2)), SQRT(1-(SIN((y.latitude - x.latitude)/2)*SIN((y.latitude - x.latitude)/2) + COS(x.latitude)*COS(y.latitude)*SIN((y.longitude - x.longitude)/2))))) < :radius)
             GROUP BY pg.generator_type
-            ORDER BY total DESC
+            ORDER BY count_most DESC
             Limit 1;            
             ";
             $stmt = $this->db->prepare($sql);
