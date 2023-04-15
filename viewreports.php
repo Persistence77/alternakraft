@@ -12,7 +12,7 @@ require_once 'db/conn.php';
 <div class="navbar-nav">
     <a class="nav-link" href="top25manufacturers.php">Top 25 popular manufacturers</a>
     <a class="nav-link" href="manufacturer_model_search.php">Manufacturer/model search</a>
-    <a class="nav-link" href="heating_cooling_method_details.php">Heaeting/cooling method details</a>
+    <a class="nav-link" href="heating_cooling_method_details.php">Heating/cooling method details</a>
     <a class="nav-link" href="waterheaterstatisticsbystate.php">Water heater statistics by state</a>
     <a class="nav-link" href="offthegridhouseholddashboard.php">Off-the-grid household dashboard</a>
     <a class="nav-link" href="householdaveragesbyradius.php">Household averages by radius</a>
